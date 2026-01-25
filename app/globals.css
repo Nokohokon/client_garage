@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Light Mode - Slate Executive */
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-hover: #f8fafc;
+  --border: #e2e8f0;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Primary (Logo-Blau) */
+  --primary: #2daae1;
+  --primary-hover: #1c8dbd;
+  --primary-fg: #ffffff;
+
+  /* Secondary (Logo-Grün) */
+  --secondary: #79b942;
+  --secondary-hover: #619435;
+  --secondary-fg: #ffffff;
+
+  /* Tertiary (Dezent / Slate-Indigo) */
+  --tertiary: #e2e8f0;
+  --tertiary-hover: #cbd5e1;
+  --tertiary-fg: #475569;
+
+  /* Status Colors (Subtil & Professionell) */
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f07d32; /* Logo-Orange */
+  --warning-hover: #d96a26;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --info: #3b82f6;
+  --info-hover: #2563eb;
+
+  /* Textfarben */
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-inv: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Dark Mode - Slate Professional */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --card: #1e293b;
+    --card-hover: #2d3748;
+    --border: #334155;
+
+    --primary: #46bef5;
+    --primary-hover: #2daae1;
+    --primary-fg: #0f172a;
+
+    --secondary: #8cd64f;
+    --secondary-hover: #79b942;
+    --secondary-fg: #0f172a;
+
+    --tertiary: #334155;
+    --tertiary-hover: #475569;
+    --tertiary-fg: #f1f5f9;
+
+    --success: #34d399;
+    --success-hover: #10b981;
+    --warning: #f29052;
+    --warning-hover: #f07d32;
+    --danger: #f87171;
+    --danger-hover: #ef4444;
+    --info: #60a5fa;
+    --info-hover: #3b82f6;
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-inv: #0f172a;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-fg: var(--secondary-fg);
+
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-hover: var(--tertiary-hover);
+  --color-tertiary-fg: var(--tertiary-fg);
+  
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  
+  --color-txt-main: var(--text-main);
+  --color-txt-muted: var(--text-muted);
+  --color-txt-inv: var(--text-inv);
 }
