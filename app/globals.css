@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import '@heroui/styles';
+
 
 :root {
   /* Light Mode - Slate Executive */
@@ -6,6 +8,8 @@
   --foreground: #0f172a;
   --card: #ffffff;
   --card-hover: #f8fafc;
+  --card-nested: #f8fafc; /* Etwas abgesetzt vom Weiß */
+  --card-nested-hover: #f1f5f9;
   --border: #e2e8f0;
 
   /* Primary (Logo-Blau) */
@@ -35,7 +39,7 @@
 
   /* Textfarben */
   --text-main: #1e293b;
-  --text-muted: #64748b;
+  --text-muted: #475569;
   --text-inv: #ffffff;
 }
 
@@ -46,6 +50,8 @@
     --foreground: #f8fafc;
     --card: #1e293b;
     --card-hover: #2d3748;
+    --card-nested: #0f172a; /* Dunkler als die äußere Card */
+    --card-nested-hover: #161e2e;
     --border: #334155;
 
     --primary: #46bef5;
@@ -70,7 +76,7 @@
     --info-hover: #3b82f6;
 
     --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --text-muted: #cbd5e1;
     --text-inv: #0f172a;
   }
 }
@@ -80,6 +86,8 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
+  --color-card-nested: var(--card-nested);
+  --color-card-nested-hover: var(--card-nested-hover);
   --color-border: var(--border);
   
   --color-primary: var(--primary);
