@@ -1,7 +1,7 @@
 'use client';
-import { Accordion } from "@heroui/react";
+import { Accordion, Modal, Button, Separator} from "@heroui/react";
 import { OrganisationSelect } from "./sidebar/organisationSelect";
-import { User, FolderKanban, Building2, Settings, CircleSmall } from "lucide-react";
+import { User, FolderKanban, Building2, Settings, CircleSmall, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,13 +11,14 @@ export function Sidebar() {
 
   return (
     <div className="hidden md:flex flex-col w-full max-w-md gap-4 bg-card rounded-sm border border-border p-4">
-      <h2 className="text-xl font-bold mb-4 text-foreground">Menu Sidebar</h2>
+      <h2 className="text-xl font-bold mb-4 text-foreground">Menu</h2>
       <OrganisationSelect />
+      <Separator/>
         <Accordion allowsMultipleExpanded className="w-full max-w-md text-txt-main ">
         <Accordion.Item>
             <Accordion.Heading>
             <Accordion.Trigger>
-                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/clients") ? "underline" : ""}`} ><User/> Klienten</span>
+                <span className={`flex justify-center items-center gap-2 ${pathname == "/dashboard"  ? "underline text-primary" : ""}`} ><LayoutDashboard/> Dashboard</span>
                 <Accordion.Indicator />
             </Accordion.Trigger>
             </Accordion.Heading>
@@ -33,7 +34,23 @@ export function Sidebar() {
         <Accordion.Item>
             <Accordion.Heading>
             <Accordion.Trigger>
-                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/projects") ? "underline" : ""}`}><FolderKanban/>Einzelklienten-Projekte</span>
+                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/clients") ? "underline text-primary" : ""}`} ><User/> Einzelklienten</span>
+                <Accordion.Indicator />
+            </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+            <Accordion.Body className="text-txt-muted flex flex-col gap-2 justify-center items-start">
+                <Link href="/dashboard/clients" className="hover:text-foreground flex justify-center items-center gap-2"> <CircleSmall/> Alle Klienten</Link>
+                <Link href="/dashboard/clients/new" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Neuen Klienten anlegen</Link>
+                <Link href="/dashboard/clients/statistics" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Klienten Statistiken</Link>
+            </Accordion.Body>
+            </Accordion.Panel>
+        </Accordion.Item>
+
+        <Accordion.Item>
+            <Accordion.Heading>
+            <Accordion.Trigger>
+                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/projects") ? "underline text-primary" : ""}`}><FolderKanban/>Einzelklienten-Projekte</span>
                 <Accordion.Indicator />
             </Accordion.Trigger>
             </Accordion.Heading>
@@ -48,7 +65,7 @@ export function Sidebar() {
         <Accordion.Item>
             <Accordion.Heading>
             <Accordion.Trigger>
-                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/organisation") ? "underline" : ""}`} ><Building2/> Organisation</span>
+                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/organisation") ? "underline text-primary" : ""}`} ><Building2/> Organisation</span>
                 <Accordion.Indicator />
             </Accordion.Trigger>
             </Accordion.Heading>
@@ -66,7 +83,7 @@ export function Sidebar() {
         <Accordion.Item>
             <Accordion.Heading>
             <Accordion.Trigger>
-                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/settings") ? "underline" : ""}`}><Settings/> Einstellungen</span>
+                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/settings") ? "underline text-primary" : ""}`}><Settings/> Einstellungen</span>
                 <Accordion.Indicator />
             </Accordion.Trigger>
             </Accordion.Heading>

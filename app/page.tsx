@@ -89,8 +89,8 @@ function FeatureCard({ icon, title, description, color }: {
   color: "primary" | "secondary" | "tertiary";
 }) {
   const colorClasses = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/10 text-secondary",
+    primary: "bg-primary/10 text-primary-fg",
+    secondary: "bg-secondary/10 text-secondary-fg",
     tertiary: "bg-tertiary text-tertiary-fg",
   };
 
@@ -113,8 +113,8 @@ function TCubCard({ iconPath, title, description, color, link }: {
   link: string;
 }) {
   const colorClasses = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/10 text-secondary",
+    primary: "bg-primary/10 text-primary-fg",
+    secondary: "bg-secondary/10 text-secondary-fg",
     tertiary: "bg-tertiary text-tertiary-fg",
   };
 
