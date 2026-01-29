@@ -1,8 +1,9 @@
 import { pgTable, text, timestamp, boolean, uuid, pgEnum, decimal } from "drizzle-orm/pg-core";
 
 // Status Enums
-export const statusEnum = pgEnum('status', ['LEAD', 'ACTIVE', 'ARCHIVED', 'PENDING']);
+export const clientStatusEnum = pgEnum('client_status', ['LEAD', 'ACTIVE', 'INACTIVE', 'ARCHIVED']);
 export const clientTypeEnum = pgEnum('client_type', ['person', 'organization']);
+export const taskStatusEnum = pgEnum('task_status', ['OPEN', 'IN_PROGRESS', 'WAITING', 'COMPLETED', 'CANCELLED']);
 
 // ==========================================
 // BETTER AUTH CORE TABLES
@@ -92,7 +93,16 @@ export const team = pgTable("team", {
     organizationId: text("organizationId").notNull().references(() => organization.id),
     name: text("name").notNull(),
     createdAt: timestamp("createdAt").notNull(),
+    updatedAt: timestamp("updatedAt"),
     metadata: text("metadata"),
+});
+
+export const teamMember = pgTable("teamMember", {
+    id: text("id").primaryKey(),
+    teamId: text("teamId").notNull().references(() => team.id),
+    userId: text("userId").notNull().references(() => user.id),
+    createdAt: timestamp("createdAt").notNull(),
+    updatedAt: timestamp("updatedAt"),
 });
 
 // ==========================================
@@ -103,29 +113,56 @@ export const clients = pgTable("clients", {
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email"),
-    status: statusEnum("status").default('LEAD'),
+    status: clientStatusEnum("status").default('LEAD'),
     type: clientTypeEnum("type").default('person'),
-    hourlyRate: decimal("hourly_rate", { precision: 10, scale: 2 }).default("0.00"),
-    responsiblePersonId: text("responsible_person_id").references(() => user.id),
-    responsibleOrganizationId: text("responsible_organization_id").references(() => organization.id),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
+    hourlyRate: decimal("hourlyRate", { precision: 10, scale: 2 }).default("0.00"),
+    responsiblePersonId: text("responsiblePersonId").references(() => user.id),
+    responsibleOrganizationId: text("responsibleOrganizationId").references(() => organization.id),
+    lastContactAt: timestamp("lastContactAt").defaultNow(),
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export const projects = pgTable("projects", {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
     finished: boolean("finished").default(false),
-    clientId: uuid("client_id").references(() => clients.id, { onDelete: 'cascade' }),
-    userId: text("user_id").references(() => user.id),
-    organizationId: text("organization_id").references(() => organization.id),
-    createdAt: timestamp("created_at").defaultNow(),
+    clientId: uuid("clientId").references(() => clients.id, { onDelete: 'cascade' }),
+    userId: text("userId").references(() => user.id),
+    organizationId: text("organizationId").references(() => organization.id),
+    createdAt: timestamp("createdAt").defaultNow(),
 });
 
 export const actions = pgTable("actions", {
     id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id").references(() => user.id),
-    actionType: text("action_type").notNull(),
+    userId: text("userId").references(() => user.id),
+    actionType: text("actionType").notNull(),
     description: text("description").notNull(),
     timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// ==========================================
+// TASKS (Aufgaben)
+// ==========================================
+
+export const tasks = pgTable("tasks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    description: text("description"),
+    status: taskStatusEnum("status").default('OPEN'),
+    
+    // Umsatz / Revenue
+    revenue: decimal("revenue", { precision: 10, scale: 2 }).default("0.00"),
+    
+    // Beziehungen
+    clientId: uuid("clientId").references(() => clients.id, { onDelete: 'cascade' }),
+    projectId: uuid("projectId").references(() => projects.id, { onDelete: 'set null' }),
+    assignedUserId: text("assignedUserId").references(() => user.id),
+    organizationId: text("organizationId").references(() => organization.id),
+    
+    // Zeitstempel
+    dueDate: timestamp("dueDate"),
+    lastContactAt: timestamp("lastContactAt").defaultNow(),
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow(),
 });

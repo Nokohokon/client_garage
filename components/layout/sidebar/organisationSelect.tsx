@@ -55,15 +55,23 @@ export function OrganisationSelect() {
             return;
         }
 
-        const { data, error } = await authClient.organization.create({
-            name: name,
-            slug: slug,
-            logo: metadata.logo || "",
-            metadata: metadata,
-            keepCurrentActiveOrganization: false,
+        const response = await fetch('/api/createOrganisation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                slug: slug,
+                logo: metadata.logo || "https://example.com/logo.png",
+                metadata: metadata,
+                keepCurrentActiveOrganization: false
+            })
         });
+
+        const data = await response.json();
         
-        console.log("Organization create response:", { data, error });
+        console.log("Organization create response:", { data});
         await resetForm();
         /*
         if (error) {
@@ -99,8 +107,11 @@ export function OrganisationSelect() {
         }
     }
 
+
+
     return (
         <div className="space-y-4">
+
             {organisations && organisations.length > 0 ? (
                 <Select
                     className="w-[256px]"
@@ -128,9 +139,9 @@ export function OrganisationSelect() {
                         <Select.Indicator />
                     </Select.Trigger>
                     <Select.Popover>
-                        <ListBox>
+                        <ListBox className="bg-card-nested text-txt-muted border border-border hover:bg-card-nested-hover">
                             {organisations.map((org) => (
-                                <ListBox.Item key={org.id} id={org.id} textValue={org.name}>
+                                <ListBox.Item key={org.id} id={org.id} textValue={org.name} className="hover:text-txt-inv">
                                     {org.name}
                                 </ListBox.Item>
                             ))}
