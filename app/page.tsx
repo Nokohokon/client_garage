@@ -1,10 +1,12 @@
 import { User, FolderKanban, Building2, ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background font-sans">
+      <Navbar/>
       {/* Hero Section */}
       <main className="flex flex-col items-center justify-center flex-1 px-6 py-20 text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
@@ -58,7 +60,7 @@ export default function Home() {
           />
           
           <TCubCard
-            iconPath="/tcub/client_garage.png"
+            iconPath="/tcub/time_tweaks.png"
             title="Time Tweaks"
             description="Zeichne konsequent deine Arbeitszeiten auf und optimiere deinen Workflow."
             color="secondary"
@@ -76,7 +78,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-6 text-center text-txt-muted text-sm border-t border-border">
-        © 2026 Client Garage. Alle Rechte vorbehalten.
+        © 2026 TCUB. Alle Rechte vorbehalten.
       </footer>
     </div>
   );
@@ -89,9 +91,9 @@ function FeatureCard({ icon, title, description, color }: {
   color: "primary" | "secondary" | "tertiary";
 }) {
   const colorClasses = {
-    primary: "bg-primary/10 text-primary-fg",
-    secondary: "bg-secondary/10 text-secondary-fg",
-    tertiary: "bg-tertiary text-tertiary-fg",
+    primary: "text-primary",
+    secondary: "text-secondary",
+    tertiary: "text-tertiary-fg",
   };
 
   return (

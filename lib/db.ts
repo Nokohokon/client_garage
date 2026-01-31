@@ -1,6 +1,4 @@
 import { Pool } from 'pg';
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
 const globalForPg = global as unknown as { pool: Pool };
 
 export const pool =

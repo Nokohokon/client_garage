@@ -1,7 +1,7 @@
 'use client';
 import { Accordion, Modal, Button, Separator} from "@heroui/react";
 import { OrganisationSelect } from "./sidebar/organisationSelect";
-import { User, FolderKanban, Building2, Settings, CircleSmall, LayoutDashboard } from "lucide-react";
+import { User, FolderKanban, Building2, Settings, CircleSmall, LayoutDashboard, ClipboardList } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,9 +24,8 @@ export function Sidebar() {
             </Accordion.Heading>
             <Accordion.Panel>
             <Accordion.Body className="text-txt-muted flex flex-col gap-2 justify-center items-start">
-                <Link href="/dashboard/clients" className="hover:text-foreground flex justify-center items-center gap-2"> <CircleSmall/> Alle Klienten</Link>
-                <Link href="/dashboard/clients/new" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Neuen Klienten anlegen</Link>
-                <Link href="/dashboard/clients/statistics" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Klienten Statistiken</Link>
+                <Link href="/dashboard/notifications" className="hover:text-foreground flex justify-center items-center gap-2"> <CircleSmall/> Benachrichtigungen</Link>
+                <Link href="/dashboard/activities" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Letzte Aktivitäten</Link>
             </Accordion.Body>
             </Accordion.Panel>
         </Accordion.Item>
@@ -43,6 +42,21 @@ export function Sidebar() {
                 <Link href="/dashboard/clients" className="hover:text-foreground flex justify-center items-center gap-2"> <CircleSmall/> Alle Klienten</Link>
                 <Link href="/dashboard/clients/new" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Neuen Klienten anlegen</Link>
                 <Link href="/dashboard/clients/statistics" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Klienten Statistiken</Link>
+            </Accordion.Body>
+            </Accordion.Panel>
+        </Accordion.Item>
+
+        <Accordion.Item>
+            <Accordion.Heading>
+            <Accordion.Trigger>
+                <span className={`flex justify-center items-center gap-2 ${pathname?.startsWith("/dashboard/tasks") ? "underline text-primary" : ""}`}><ClipboardList/> Aufgaben</span>
+                <Accordion.Indicator />
+            </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+            <Accordion.Body className="text-txt-muted flex flex-col gap-2 justify-center items-start">
+                <Link href="/dashboard/tasks" className="hover:text-foreground flex justify-center items-center gap-2"> <CircleSmall/> Alle Aufgaben</Link>
+                <Link href="/dashboard/tasks/new" className="hover:text-foreground flex justify-center items-center gap-2"><CircleSmall/> Neue Aufgabe erstellen</Link>
             </Accordion.Body>
             </Accordion.Panel>
         </Accordion.Item>

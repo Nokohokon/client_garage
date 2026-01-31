@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { auth } from './auth';
 import { Client, Project, Deletion, User, DashboardData, Task, TaskWithClient, RevenueOverview, Action } from './types';
-import { db } from './db'; // Dein PostgreSQL Pool
+import db from './db';
 
 // ================ AUTH HELPERS ================
 
@@ -20,9 +20,9 @@ export async function getOrganizations() {
     return await auth.api.listOrganizations({ headers: await headers() });
 }
 
-export async function createOrganization(name: string, slug: string) {  
+export async function createOrganization(name: string, slug: string, logo?: string, metadata?: Record<string, any>, userId?: string, keepCurrentActiveOrganization: boolean = false) {  
     const data = await auth.api.createOrganization({
-        body: { name, slug },
+        body: { name, slug, logo: logo || undefined, metadata: metadata || {}, userId: userId || undefined, keepCurrentActiveOrganization },
         headers: await headers(),
     });
     await insertAction('createOrganization', `Created organization ${name}`);

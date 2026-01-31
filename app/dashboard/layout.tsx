@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Navbar from "@/components/layout/dashboard/Navbar";
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -21,7 +23,10 @@ export default function DashboardLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background flex min-h-screen gap-6 p-4 transition-colors duration-300`}
       >
         <Sidebar />
-        {children}
+        <div className="flex flex-col w-full">
+          <Navbar/>
+          {children}
+        </div>
       </div>
   );
 }

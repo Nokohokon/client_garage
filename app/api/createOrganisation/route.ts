@@ -2,22 +2,14 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createOrganization } from "@/lib/actions";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
 		console.log("Received request to create organization with body:", body);
-		const data = await auth.api.createOrganization({
-			body: {
-				name: body.name, // required
-				slug: body.slug, // required
-				logo: body.logo,
-				metadata: body.metadata,
-				userId: body.userId,
-				keepCurrentActiveOrganization: body.keepCurrentActiveOrganization,
-			},
-			headers: await headers(),
-		});
+		const data = await createOrganization(body.name, body.slug, body.logo, body.metadata, body.userId, body.keepCurrentActiveOrganization);
+
 		console.log("Organization created successfully:", data);
 
 		return NextResponse.json(data);
