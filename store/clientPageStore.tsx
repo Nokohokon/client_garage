@@ -48,6 +48,7 @@ interface ClientPageState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   resetFilters: () => void;
+  setTotal: (total: number) => void;
 }
 
 export const useClientPageStore = create<ClientPageState>((set) => ({
@@ -82,6 +83,7 @@ export const useClientPageStore = create<ClientPageState>((set) => ({
   page: 1,
   pageSize: 10,
   total: 0,
+  setTotal: (total) => set({ total }),
 
   // =====================
   // Actions

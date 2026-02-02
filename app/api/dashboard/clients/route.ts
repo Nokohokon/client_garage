@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
 import { Client, ClientStatus, ClientType } from "@/lib/types";
+import { createClient } from "@/lib/actions";
 
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -111,4 +112,31 @@ export async function GET(req: NextRequest) {
     pageSize,
     total: counts.total,
   });
+}
+
+
+export async function POST(req: NextRequest) {
+  console.log('Schritt 1')
+  const session = await auth.api.getSession({
+    headers: req.headers,
+  });
+
+  console.log('Schritt 2')
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const data = await req.json();
+  console.log('Daten:', data)
+
+  try {
+    const newClient = await createClient(data.name, data.email, session.user.id, undefined,  'person' );
+    return NextResponse.json(newClient, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Failed to create client" },
+      { status: 500 }
+    );
+  }
 }

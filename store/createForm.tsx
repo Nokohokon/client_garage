@@ -41,3 +41,23 @@ export const createOrganisation = create<OrganisationForm>((set) => ({
         metadata: {}
     }),
 }))
+
+
+interface ClientForm {
+    name: string;
+    email: string;
+    setName: (name: string) => void;
+    setEmail: (email: string) => void;
+    resetForm: () => void;
+}
+
+export const clientFormState = create<ClientForm>((set) => ({
+    name: 'Max Mustermann',
+    email: 'max@mustermann.de',
+    setName: (name: string) => set({name: name}),
+    setEmail: (email: string) => set({email: email}),
+    resetForm: () => set({
+        name: 'Max Mustermann',
+        email: 'max@mustermann.de',
+    }),
+}))

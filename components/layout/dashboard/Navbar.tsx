@@ -87,7 +87,7 @@ export default function Navbar () {
                     </button>
                 </div>
             </div>
-            <Separator className="my-4 mr-4 bg-card" />
+            <Separator className="mb-4 mr-4 h-0.5 bg-card" />
 
         </div>
     )

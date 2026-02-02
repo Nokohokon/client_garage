@@ -2,12 +2,11 @@
 
 import { Button, Label, Input, TextField, Select, Avatar, AvatarFallback, Modal, ListBox } from "@heroui/react";
 import { useIsOpen } from "@/store/open";
-import { createOrganisation } from "@/store/createOrganisationForm";
+import { createOrganisation } from "@/store/createForm";
 import { authClient } from "@/lib/auth-client";
 import { Building2, Plus, Mail } from "lucide-react";
 import { showToast } from "nextjs-toast-notify";
 
-// TODO: Diese URL in eine Umgebungsvariable (.env) verschieben!
 const webHookUrl = "https://discord.com/api/webhooks/1465779729545040014/4zdrqAOeQS3s2Zx9-4T2IjDFieeiORvWdUvtwoZq4Emhlw8mz2XcD96FhuV4AxOJOCIi";
 
 async function sendDiscordMessage(message: string) {
