@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, uuid, pgEnum, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, pgEnum, decimal, integer } from "drizzle-orm/pg-core";
 
 // Status Enums
 export const clientStatusEnum = pgEnum('client_status', ['LEAD', 'ACTIVE', 'INACTIVE', 'ARCHIVED']);

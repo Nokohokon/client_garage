@@ -140,3 +140,38 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: req.headers,
+  });
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { searchParams } = new URL(req.url);
+  const clientId = searchParams.get("clientId");
+  
+  if (!clientId) {
+    return NextResponse.json({ error: "Client ID is required" }, { status: 400 });
+  }
+  
+  try {
+    await db.query(
+      `
+      DELETE FROM clients
+      WHERE id = $1 AND "responsiblePersonId" = $2
+      `,
+      [clientId, session.user.id]
+    );
+    
+    return NextResponse.json({ message: "Client deleted successfully" }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error deleting client:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete client" },
+      { status: 500 }
+    );
+  }
+}

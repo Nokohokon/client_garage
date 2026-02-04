@@ -61,3 +61,17 @@ export const clientFormState = create<ClientForm>((set) => ({
         email: 'max@mustermann.de',
     }),
 }))
+
+interface ProjectForm {
+    name: string;
+    setName: (name: string) => void;
+    resetForm: () => void;
+}
+
+export const projectAddFormState = create<ProjectForm>((set) => ({
+    name: 'Neues Projekt',
+    setName: (name: string) => set({name: name}),
+    resetForm: () => set({
+        name: 'Neues Projekt',
+    }),
+}))

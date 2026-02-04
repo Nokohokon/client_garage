@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useClientPageStore } from '@/store/clientPageStore';
-import { clientFormState } from '@/store/createForm';
+import { clientFormState, projectAddFormState } from '@/store/createForm';
 import { useIsOpen } from '@/store/open';
 import { UsersIcon } from '@/components/icons/UsersIcon';
-import { Hourglass, UserRoundX, Plus, MoreVertical, RefreshCcwDot, Download, Table, LayoutPanelLeft, Settings, Mail } from 'lucide-react';
+import { Hourglass, UserRoundX, Plus, MoreVertical, RefreshCcwDot, Download, Table, LayoutPanelLeft, Settings, Mail, Trash, Kanban } from 'lucide-react';
 import {
   Button,
   Select,
@@ -15,7 +16,11 @@ import {
   Modal,
   TextField,
   Label,
-  Input
+  Input,
+  Dropdown,
+  Separator,
+  Description,
+  Header
 } from '@heroui/react';
 import { ClientType, ClientStatus } from '@/lib/types';
 
@@ -49,6 +54,8 @@ export default function ClientsPage() {
   const name = clientFormState((s) => s.name)
   const email = clientFormState((s) => s.email)
   const {setEmail, setName, resetForm} = clientFormState()
+  const project = projectAddFormState((s) => s.name)
+  const {setName: setProjectName, resetForm: resetProjectForm} = projectAddFormState()
 
   const {
     clients,
@@ -155,6 +162,27 @@ export default function ClientsPage() {
       console.error('Failed to create client');
     }
   }
+
+
+  async function deleteClient(clientId: string) {
+    const response = await fetch(`/api/dashboard/clients?clientId=${clientId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      setClients(clients.filter(client => client.id !== clientId));
+      setTotal(total - 1);
+      // Update counts accordingly (this is a simplified example)
+      setCounts({
+        ...counts,
+        total: counts.total - 1,
+      });
+    } else {
+      console.error('Failed to delete client');
+    }
+  }
+
+
 
   return (
     <div className="mx-1 flex flex-col gap-4">
@@ -296,7 +324,7 @@ export default function ClientsPage() {
             <tr>
               <th className="text-left p-4 text-txt-muted font-medium">Name</th>
               <th className="text-left p-4 text-txt-muted font-medium">Typ</th>
-              <th className="text-left p-4 text-txt-muted font-medium">Status</th>
+              <th className="text-left p-4 text-txt-muted font-medium">tus</th>
               <th className="text-left p-4 text-txt-muted font-medium">Letzter Kontakt</th>
               <th className="text-left p-4 text-txt-muted font-medium">Verantwortlich</th>
               <th className="text-right p-4 text-txt-muted font-medium">Aktionen</th>
@@ -306,15 +334,17 @@ export default function ClientsPage() {
             {clients.map((client) => (
               <tr key={client.id} className="border-b border-border hover:bg-card-hover">
                 <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                      {client.name.charAt(0).toUpperCase()}
+                  <Link href={`/dashboard/clients/${client.id}`}  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                        {client.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="text-txt-main font-medium">{client.name}</div>
+                        {client.email && <div className="text-txt-muted text-sm">{client.email}</div>}
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-txt-main font-medium">{client.name}</div>
-                      {client.email && <div className="text-txt-muted text-sm">{client.email}</div>}
-                    </div>
-                  </div>
+                  </Link>
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-2 text-txt-muted">
@@ -354,13 +384,88 @@ export default function ClientsPage() {
                 </td>
                 <td className="p-4">
                   <div className="flex items-center justify-end gap-2">
-                    <button className='cursor-pointer'>
-                      <MoreVertical className="w-4 h-4 text-txt-muted" />
-                    </button>
+                    <Dropdown>
+                      <Dropdown.Trigger>
+                        <MoreVertical className="w-5 h-5 text-txt-muted hover:text-txt-main" />
+                      </Dropdown.Trigger>
+                      <Dropdown.Popover>
+                        <Dropdown.Menu className='bg-card-nested hover:text-danger'>
+                          <Dropdown.Item className='flex justify-center text-txt-main hover:text-txt-inv'>
+                            Statistiken
+                            <Description />
+                            <Dropdown.ItemIndicator />
+                          </Dropdown.Item>
+                          <Separator />
+                          <Dropdown.Section>
+                            <Header />
+                            <Dropdown.Item className='text-txt-main hover:text-txt-inv'>
+                              <Link href={`${client.id}/projects`} className='flex items-center gap-2'>
+                              <Kanban className="w-4 text-txt-muted hover:text-txt-main h-4 mr-2" />
+                              Projekte anzeigen
+                              </Link>
+                            </Dropdown.Item>
+                            <Dropdown.Item className='text-txt-main hover:text-txt-inv' onPress={()=> deleteClient(client.id)}>
+                              <Trash className="w-4 text-danger hover:text-danger-hover h-4 mr-2" />
+                              Klienten löschen
+                            </Dropdown.Item>
+                          </Dropdown.Section>
+                        </Dropdown.Menu>
+                      </Dropdown.Popover>
+                    </Dropdown>
                   </div>
                 </td>
               </tr>
             ))}
+            <tr>
+              <td colSpan={6} className="p-4 text-txt-muted text-sm">
+                <div className="flex w-full justify-between items-center">
+                  <span className="flex flex-row gap-2 items-center">
+                    <span>{clients.length}</span>
+                    <span>von</span>
+                    <span>{total}</span>
+                    <span>Klienten angezeigt.</span>
+                  </span>
+                  <div className="flex items-center gap-4 justify-end w-full">
+                    <button
+                      className="px-3 py-1 bg-card-nested hover:bg-card-nested-hover rounded-lg"
+                      disabled={page <= 1}
+                      onClick={() => {
+                        if (page > 1) {
+                          useClientPageStore.getState().setPage(page - 1);
+                        }
+                      }}
+                    >
+                      Vorherige
+                    </button>
+                    <span className="flex flex-row items-center gap-2">
+                      <span>Seite</span>
+                      <input
+                        type="number"
+                        value={page}
+                        onChange={(e) => {
+                          const newPage = Math.min(Math.max(1, Number(e.target.value)), Math.ceil(total / pageSize));
+                          useClientPageStore.getState().setPage(newPage);
+                        }}
+                        className="w-12 text-center rounded-lg border border-card-nested"
+                      />
+                      <span>von</span>
+                      <span>{Math.ceil(total / pageSize)}</span>
+                    </span>
+                    <button
+                      className="px-3 py-1 bg-card-nested hover:bg-card-nested-hover rounded-lg"
+                      disabled={page >= Math.ceil(total / pageSize)}
+                      onClick={() => {
+                        if (page < Math.ceil(total / pageSize)) {
+                          useClientPageStore.getState().setPage(page + 1);
+                        }
+                      }}
+                    >
+                      Nächste
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
 
@@ -409,8 +514,27 @@ function Chip({
   label: string;
   type: type;
 }) {
+  let bg = '';
+  let hover = '';
+  switch (type) {
+    case 'success':
+      bg = 'bg-success';
+      hover = 'hover:bg-success-hover';
+      break;
+    case 'warning':
+      bg = 'bg-warning';
+      hover = 'hover:bg-warning-hover';
+      break;
+    case 'danger':
+      bg = 'bg-danger';
+      hover = 'hover:bg-danger-hover';
+      break;
+    default:
+      bg = 'bg-gray-300';
+      hover = 'hover:bg-gray-400';
+  }
   return (
-    <div className={`bg-${type} hover:bg-${type}-hover text-txt-main p-2 rounded-lg `}>
+    <div className={`${bg} ${hover} text-txt-main p-2 flex items-center justify-center rounded-lg`}>
       {label}
     </div>
   )

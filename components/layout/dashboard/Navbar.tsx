@@ -33,6 +33,7 @@ export default function Navbar () {
         "/dashboard/revenue": <h1 className="text-3xl font-bold text-txt-main">Umsatz</h1>,
         "/dashboard/organisation": <h1 className="text-3xl font-bold text-txt-main">Organisation</h1>,
         "/dashboard/settings": <h1 className="text-3xl font-bold text-txt-main">Einstellungen</h1>,
+        "/dashboard/clients/statistics": <h1 className="text-3xl font-bold text-txt-main">Klienten Statistiken</h1>,
     }
 
 

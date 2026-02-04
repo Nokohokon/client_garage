@@ -208,7 +208,7 @@ export default function DashboardPage() {
                         <div className="relative flex-1 w-full p-3 ml-6 overflow-auto">
                             <ul className="list-none text-txt-main w-full">
                                 {dashboardData.latestActions && dashboardData.latestActions.length > 0 ? (
-                                    dashboardData.latestActions.map((action: Action) => (
+                                    dashboardData.latestActions.slice(0, 5).map((action: Action) => (
                                         <li key={action.id} className="mb-2 flex justify-start items-center">
                                             {action.actionType.startsWith('create') && <Plus className="w-6 h-6  mr-1.5 text-txt-main/80"/>}
                                             <span className="text-base text-txt-main/80">{action.description}</span>
