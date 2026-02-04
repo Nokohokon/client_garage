@@ -166,3 +166,26 @@ export const tasks = pgTable("tasks", {
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
+
+
+
+export const clientMetrics = pgTable("client_metrics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => user.id),
+  timestamp: timestamp("timestamp").notNull(),
+  granularity: text("granularity").notNull(), // 'hour' | 'day'
+  
+  totalClients: integer("total_clients").default(0),
+  activeClients: integer("active_clients").default(0),
+  leadClients: integer("lead_clients").default(0),
+  inactiveClients: integer("inactive_clients").default(0),
+  
+  clientsAdded: integer("clients_added").default(0),
+  clientsLost: integer("clients_lost").default(0),
+  clientsActivated: integer("clients_activated").default(0),
+  
+  totalRevenue: decimal("total_revenue", { precision: 10, scale: 2 }).default("0.00"),
+  completedTasks: integer("completed_tasks").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});

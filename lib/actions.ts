@@ -310,3 +310,166 @@ export async function insertAction(actionType: string, description: string) {
         [crypto.randomUUID(), userId, actionType, description]
     );
 }
+
+
+// statistics
+
+export async function createMetricSnapshot(
+  userId: string, 
+  granularity: 'hour' | 'day'
+) {
+  const now = new Date();
+  const timestamp = granularity === 'hour' 
+    ? new Date(now.setMinutes(0, 0, 0)) 
+    : new Date(now.setHours(0, 0, 0, 0));
+
+  // Hole aktuellen Stand
+  const clientCounts = await db.query(`
+    SELECT 
+      COUNT(*)::int as total,
+      COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END)::int as active,
+      COUNT(CASE WHEN status = 'LEAD' THEN 1 END)::int as lead,
+      COUNT(CASE WHEN status = 'INACTIVE' THEN 1 END)::int as inactive
+    FROM clients
+    WHERE "responsiblePersonId" = $1
+  `, [userId]);
+
+  const counts = clientCounts.rows[0];
+
+  // Hole Änderungen seit letztem Snapshot
+  const lastSnapshot = await db.query(`
+    SELECT * FROM client_metrics
+    WHERE user_id = $1 AND granularity = $2
+    ORDER BY timestamp DESC
+    LIMIT 1
+  `, [userId, granularity]);
+
+  const last = lastSnapshot.rows[0];
+  const clientsAdded = last ? Math.max(0, counts.total - last.total_clients) : 0;
+  const clientsLost = last ? Math.max(0, last.total_clients - counts.total) : 0;
+  const clientsActivated = last ? Math.max(0, counts.active - last.active_clients) : 0;
+
+  // Revenue seit letztem Snapshot
+  const revenueQuery = last 
+    ? `WHERE "assignedUserId" = $1 AND status = 'COMPLETED' AND "updatedAt" > $2`
+    : `WHERE "assignedUserId" = $1 AND status = 'COMPLETED'`;
+  
+  const revenueParams = last ? [userId, last.timestamp] : [userId];
+  
+  const revenue = await db.query(`
+    SELECT 
+      COALESCE(SUM(revenue::numeric), 0) as total,
+      COUNT(*)::int as count
+    FROM tasks
+    ${revenueQuery}
+  `, revenueParams);
+
+  // Insert Snapshot
+  await db.query(`
+    INSERT INTO client_metrics (
+      user_id, timestamp, granularity,
+      total_clients, active_clients, lead_clients, inactive_clients,
+      clients_added, clients_lost, clients_activated,
+      total_revenue, completed_tasks
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    ON CONFLICT (user_id, timestamp, granularity) DO UPDATE SET
+      total_clients = EXCLUDED.total_clients,
+      active_clients = EXCLUDED.active_clients,
+      lead_clients = EXCLUDED.lead_clients,
+      inactive_clients = EXCLUDED.inactive_clients,
+      clients_added = EXCLUDED.clients_added,
+      clients_lost = EXCLUDED.clients_lost,
+      clients_activated = EXCLUDED.clients_activated,
+      total_revenue = EXCLUDED.total_revenue,
+      completed_tasks = EXCLUDED.completed_tasks
+  `, [
+    userId, timestamp, granularity,
+    counts.total, counts.active, counts.lead, counts.inactive,
+    clientsAdded, clientsLost, clientsActivated,
+    revenue.rows[0].total, revenue.rows[0].count
+  ]);
+}
+
+// Metriken abrufen mit Zeitbereich
+export async function getMetrics(
+  userId: string,
+  granularity: 'hour' | 'day',
+  hours?: number
+) {
+  const hoursBack = hours || (granularity === 'hour' ? 24 : 24 * 30);
+  
+  const metrics = await db.query(`
+    SELECT 
+      timestamp,
+      total_clients,
+      active_clients,
+      lead_clients,
+      inactive_clients,
+      clients_added,
+      clients_lost,
+      clients_activated,
+      total_revenue,
+      completed_tasks
+    FROM client_metrics
+    WHERE user_id = $1 
+    AND granularity = $2
+    AND timestamp >= NOW() - interval '${hoursBack} hours'
+    ORDER BY timestamp ASC
+  `, [userId, granularity]);
+
+  return metrics.rows.map((m, idx, arr) => {
+    if (idx === 0) return { ...m, clientGrowthRate: 0, revenueGrowthRate: 0 };
+    
+    const prev = arr[idx - 1];
+    const clientGrowthRate = prev.total_clients > 0
+      ? ((m.total_clients - prev.total_clients) / prev.total_clients * 100)
+      : 0;
+    const revenueGrowthRate = parseFloat(prev.total_revenue) > 0
+      ? ((parseFloat(m.total_revenue) - parseFloat(prev.total_revenue)) / parseFloat(prev.total_revenue) * 100)
+      : 0;
+
+    return {
+      ...m,
+      timestamp: m.timestamp.toISOString(),
+      clientGrowthRate: clientGrowthRate.toFixed(2),
+      revenueGrowthRate: revenueGrowthRate.toFixed(2)
+    };
+  });
+}
+
+// Echtzeit-Statistiken (ohne Snapshot)
+export async function getLiveMetrics(userId: string) {
+  const [clients, tasks, recentActivity] = await Promise.all([
+    db.query(`
+      SELECT 
+        COUNT(*)::int as total,
+        COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END)::int as active,
+        COUNT(CASE WHEN "createdAt" >= NOW() - interval '24 hours' THEN 1 END)::int as new_24h
+      FROM clients
+      WHERE "responsiblePersonId" = $1
+    `, [userId]),
+    
+    db.query(`
+      SELECT 
+        COUNT(*)::int as total,
+        COUNT(CASE WHEN status = 'COMPLETED' THEN 1 END)::int as completed,
+        COALESCE(SUM(CASE WHEN status = 'COMPLETED' THEN revenue::numeric ELSE 0 END), 0) as revenue_24h
+      FROM tasks
+      WHERE "assignedUserId" = $1
+      AND "updatedAt" >= NOW() - interval '24 hours'
+    `, [userId]),
+    
+    db.query(`
+      SELECT COUNT(*)::int as count
+      FROM actions
+      WHERE "userId" = $1
+      AND timestamp >= NOW() - interval '1 hour'
+    `, [userId])
+  ]);
+
+  return {
+    clients: clients.rows[0],
+    tasks: tasks.rows[0],
+    activityLastHour: recentActivity.rows[0].count
+  };
+}
